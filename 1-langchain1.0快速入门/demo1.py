@@ -35,12 +35,16 @@ agent = create_agent(
             # pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
             detector=r"\b[\w\.-]+@qq\.com\b"
         )
-    ]
+    ],
+    system_prompt="你是一个专业的客服助手，帮助用户查询订单状态。当用户提到订单号时，直接调用query_order_status工具查询订单状态，不要询问用户确认。"
 )
 
 # 测试运行
 if __name__ == "__main__":
-    result = agent.invoke({"messages": [{"role": "user", "content": "帮我查询1024订单状态"}]})
+    result = agent.invoke({"messages": [{"role": "user", "content": 
+    # "帮我查询1024订单状态"
+    "我的邮箱是123@qq.com，帮我查询1024订单状态"
+    }]})
     print("AI回复：", result)
     # print(result['messages'][-1].content)
     for message in result["messages"]:
