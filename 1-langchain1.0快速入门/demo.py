@@ -3,12 +3,34 @@ from langchain.tools import tool
 from langchain_deepseek import ChatDeepSeek
 from langchain_community.tools.tavily_search import TavilySearchResults
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+import sys
+import os
+
+# 添加上级目录到Python路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# 从上级目录导入config模块
+from config import OLLAMA_URL, OLLAMA_MODEL
+
 load_dotenv()
 
 # https://www.tavily.com/   .env TAVILY_API_KEY
 web_search = TavilySearchResults(max_results=2)
-model = ChatDeepSeek(model="deepseek-chat")
 
+# 尝试使用本地Ollama模型，如果失败则使用DeepSeek模型
+try:
+    model = ChatOpenAI(
+        base_url=OLLAMA_URL,  # 本地模型的 API 地址
+        api_key="dummy-key",  # 本地模型通常不需要真实的 API key
+        model=OLLAMA_MODEL,  # 本地部署的模型名称
+        timeout=300
+    )
+    print("成功连接到本地Ollama模型")
+except Exception as e:
+    print(f"无法连接到本地Ollama模型: {e}")
+    print("使用DeepSeek模型作为备选")
+    model = ChatDeepSeek(model="deepseek-chat")
 # 定义查询订单状态的函数
 # def query_order_status(order_id):
 #     """查询订单状态，根据订单号返回订单的发货和送达信息。"""
@@ -45,9 +67,9 @@ agent = create_agent(
 # 调用智能体
 result = agent.invoke({
     # "messages": [{"role": "user", "content": "请帮我查询2024年诺贝尔物理学奖得主是谁？?"}]
-    "messages": [{"role": "user", "content": "当前美国的总统是谁？"}]
+    # "messages": [{"role": "user", "content": "当前美国的总统是谁？"}]
     # "messages": [{"role": "user", "content": "查询退款政策"}]
-    # "messages": [{"role": "user", "content": "查询订单号1024的相关信息"}]
+    "messages": [{"role": "user", "content": "查询订单号1024的相关信息"}]
 })
 
 
