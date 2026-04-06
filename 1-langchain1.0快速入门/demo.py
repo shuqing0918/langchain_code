@@ -27,7 +27,8 @@ def query_order_status(order_id: str) -> str:
 
 
 # 定义退款政策说明函数
-def refund_policy(keyword):
+@tool("refund_policy", description="查询退款政策，返回退款规则说明")
+def refund_policy(keyword: str) -> str:
     """查询退款政策，返回退款规则说明。"""
     print("keyword = ", keyword)
     return "我们的退款政策是：在购买后7天内可以申请全额退款，需提供购买凭证。"
@@ -38,15 +39,17 @@ agent = create_agent(
     # model="openai:gpt-4o",  # 支持字符串标识或模型实例[citation:3]
     model=model,  # 支持字符串标识或模型实例[citation:3]
     tools=[query_order_status, refund_policy, web_search],  # 赋予智能体工具调用能力
-    system_prompt="你是一个专业的客服助手，帮助用户查询订单信息还可以调用工具帮助用户解决问题"  # 定义角色和行为[citation:3]
+    system_prompt="你是一个专业的客服助手，帮助用户查询订单信息和退款政策。当用户查询退款政策时，直接调用refund_policy工具。"  # 定义角色和行为[citation:3]
 )
 
 # 调用智能体
 result = agent.invoke({
     # "messages": [{"role": "user", "content": "请帮我查询2024年诺贝尔物理学奖得主是谁？?"}]
-    "messages": [{"role": "user", "content": "2026年的美国总统是谁？"}]
+    "messages": [{"role": "user", "content": "当前美国的总统是谁？"}]
+    # "messages": [{"role": "user", "content": "查询退款政策"}]
+    # "messages": [{"role": "user", "content": "查询订单号1024的相关信息"}]
 })
 
 
-print(result)
+# print(result)
 print(result['messages'][-1].content)
