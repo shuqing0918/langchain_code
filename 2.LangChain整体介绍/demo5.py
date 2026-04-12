@@ -32,7 +32,7 @@ embeddings = DashScopeEmbeddings(
     model="text-embedding-v4",
     dashscope_api_key=os.getenv("QIANWEN_API_KEY")
 )
-
+# 从文档集合创建向量库
 vectorstore = FAISS.from_documents(docs, embeddings)
 
 # 3. 定义 RAG 检索工具

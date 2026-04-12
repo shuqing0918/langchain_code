@@ -16,10 +16,7 @@ print(chat_prompt)
 # 创建模型实例
 model = init_chat_model(model="deepseek:deepseek-chat")
 
-# 输入提示
-# messages = chat_prompt.format_messages(text="我今年18岁，我的舅舅今年38岁，我的爷爷今年72岁，我和舅舅一共多少岁了？")
-# print(messages)
-messages = chat_prompt.format_messages(input_language="英文", output_language="中文", text="I love Large Language Model.")
+messages = chat_prompt.format_messages(input_language="中文", output_language="英文", text="明天星期 又要上班咯")
 print(messages)
 # 得到模型的输出
 output = model.invoke(messages)
