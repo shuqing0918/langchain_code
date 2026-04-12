@@ -1,6 +1,6 @@
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
-
+# agent的使用
 load_dotenv()
 from langchain.agents import create_agent
 
@@ -38,12 +38,18 @@ def get_weather(city: str) -> str:
 agent = create_agent(
     model=model,
     tools=[get_weather],  # 只给一个工具
-    system_prompt="你是一个有帮助的助手，可以查询天气信息。"
+    system_prompt="你是一个有帮助的助手，可以查询天气信息。还可以提供其他信息。"
 )
 
 response = agent.invoke({
-    "messages": [{"role": "user", "content": "北京今天天气怎么样？"}]
+    "messages": [
+        {"role": "user", "content": "北京今天天气怎么样？"},
+        {"role": "assistant", "content": "巴菲特是谁？"}
+        ]
 })
 
 for message in response["messages"]:
     message.pretty_print()
+print("-"*50)
+    
+print(response)
