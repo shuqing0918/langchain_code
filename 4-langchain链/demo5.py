@@ -1,20 +1,21 @@
 from langchain_community.utilities import SQLDatabase
-
+from dotenv import load_dotenv
+load_dotenv()
 # 连接 sqlite 数据库
 # db = SQLDatabase.from_uri("sqlite:///demo.db") 
 
 # 连接 MySQL 数据库
 db_user = "root"
-db_password = "root"
+db_password = "02416.HK"
 db_host = "127.0.0.1"
 db_port = "3306"
-db_name = "func"
+db_name = "order_service"
 db = SQLDatabase.from_uri(f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}")
 
 print("那种数据库：", db.dialect)
 print("获取数据表：", db.get_usable_table_names())
 # 执行查询
-res = db.run("SELECT count(*) FROM students;")
+res = db.run("SELECT count(*) FROM `order`;")
 print("查询结果：", res)
 
 from langchain.chat_models import init_chat_model
@@ -26,18 +27,30 @@ llm = init_chat_model(model="deepseek:deepseek-chat")
 chain = create_sql_query_chain(llm=llm, db=db)
 # user = input("输入要查询的需求:")
 
+response = chain.invoke({"question": "查询订单表的创建语句"})
+
 # response = chain.invoke({"question": "数据表orders哪个用户消费最高？"})
 # response = chain.invoke({"question": "查询商品分类表中的商品分类有多少种？只返回可以执行的SQL语句"})
 # response = chain.invoke({"question": "查询一班的学生数学成绩是多少？只返回可以执行的SQL语句"})
 # response = chain.invoke({"question": user})
 # 限制使用的表
-response = chain.invoke({"question": "查询一班的学生数学成绩是多少？只返回可以执行的SQL语句", "table_names_to_use": ["students"]})
+# response = chain.invoke({"question": "查询一班的学生数学成绩是多少？只返回可以执行的SQL语句", "table_names_to_use": ["students"]})
 print(response)
 
 
 def _sanitize_output(text: str):
-    _, after = text.split("```sql")
-    return after.split("```")[0]
+    # 检查是否包含 SQLQuery: 标记
+    if "SQLQuery: " in text:
+        # 提取 SQLQuery: 后面的内容
+        sql_part = text.split("SQLQuery: ")[1]
+        return sql_part.strip()
+    # 检查是否包含 ```sql 标记
+    elif "```sql" in text:
+        _, after = text.split("```sql")
+        return after.split("```")[0].strip()
+    else:
+        # 如果没有标记，直接返回文本
+        return text.strip()
 
 
 result = _sanitize_output(response)
